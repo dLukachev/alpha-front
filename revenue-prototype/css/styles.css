@@ -48,8 +48,7 @@ html,body{height:100%;margin:0;background:var(--bg);color:#0f1720}
 .topbar{display:flex;align-items:center;gap:12px;padding:16px 18px;background:transparent}
 .logo{color:var(--muted);text-decoration:none}
 .title{margin:0;color:var(--accent)}
-/* Logo */
-.brand-logo{height:64px;display:inline-block;object-fit:contain;position:fixed;top:16px;left:18px;z-index:40}
+.brand-logo{height:64px;display:inline-block;object-fit:contain}
 .topbar .logo{display:flex;align-items:center}
 .topbar .logo img{display:block}
 
