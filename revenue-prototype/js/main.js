@@ -5,32 +5,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
-    const formData = new FormData(form);
-    const data = {};
-    formData.forEach((value, key) => {
-      data[key] = value;
-    });
-
-    // Prepare payload for model
-    const payload = {
-      last_name: data.last_name,
-      first_name: data.first_name,
-      middle_name: data.middle_name,
-      age: Number(data.age),
-      income: Number(data.income),
-      has_children: data.has_children === 'yes',
-      marital_status: data.marital_status,
-      credit_history: data.credit_history,
-      request_amount: Number(data.request_amount),
-      employment_years: Number(data.employment_years),
-      existing_loans: data.existing_loans === 'yes'
-    };
+    // Build normalized payload dict
+    const payload = buildFinancePayloadFromForm(form);
 
     try {
       const resp = await fetch(window.BACKEND_URL + '/finance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({data: payload})
       });
       if (!resp.ok) throw new Error('Ошибка отправки данных');
       const result = await resp.json();
@@ -75,6 +57,27 @@ document.addEventListener('DOMContentLoaded', function () {
       // also keep last_task_id for backwards compatibility
       if(taskId) localStorage.setItem('last_task_id', taskId);
     }catch(e){ console.warn('saveRequestHistory failed', e); }
+  }
+
+  // Build normalized payload (dict) from a form element
+  function buildFinancePayloadFromForm(form){
+    const data = {};
+    try{ new FormData(form).forEach((v,k)=>data[k]=v); }catch(e){ /*ignore*/ }
+    const payload = {
+      last_name: data.last_name || '',
+      first_name: data.first_name || '',
+      middle_name: data.middle_name || '',
+      age: data.age ? Number(data.age) : null,
+      income: data.income ? Number(data.income) : null,
+      has_children: data.has_children === 'yes',
+      marital_status: data.marital_status || null,
+      credit_history: data.credit_history || null,
+      request_amount: data.request_amount ? Number(data.request_amount) : null,
+      employment_years: data.employment_years ? Number(data.employment_years) : null,
+      existing_loans: data.existing_loans === 'yes',
+      submitted_at: data.submitted_at || new Date().toISOString()
+    };
+    return payload;
   }
 
   function formatMoney(x){
@@ -165,28 +168,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
     form.addEventListener('submit', async (e)=>{
       e.preventDefault();
-      const data = {};
-      new FormData(form).forEach((v,k)=>data[k]=v);
-      // add optional fields
-      data.submitted_at = new Date().toISOString();
+        // build normalized payload dict
+        const payload = buildFinancePayloadFromForm(form);
 
-      try{
-        const res = await fetch(`${BACKEND_URL}/finance`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
-        if(!res.ok) throw new Error('network');
-        const json = await res.json();
-        const taskId = json.task_id || json.taskId || json.id;
-        if(!taskId) throw new Error('no-task-id');
-        // store for later retrieval and history
-        try{ saveRequestHistory(data, taskId); }catch(e){/*ignore*/}
-        localStorage.setItem('last_task_id', taskId);
-        // navigate to result page with id
-        location.href = 'model.html?task_id=' + encodeURIComponent(taskId);
-      }catch(err){
+        try{
+          const res = await fetch(`${BACKEND_URL}/finance`, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data: payload})});
+          if(!res.ok) throw new Error('network');
+          const json = await res.json();
+          const taskId = json.task_id || json.taskId || json.id;
+          if(!taskId) throw new Error('no-task-id');
+          // store for later retrieval and history
+          try{ saveRequestHistory(payload, taskId); }catch(e){/*ignore*/}
+          localStorage.setItem('last_task_id', taskId);
+          // navigate to result page with id
+          location.href = 'model.html?task_id=' + encodeURIComponent(taskId);
+        }catch(err){
         // fallback: simulate the server response (mock) and navigate with example id
         console.warn('POST /finance failed, using mock response', err);
         const mockId = 'd6c6402e-7423-46ed-ada0-44bb923613ee';
         localStorage.setItem('last_task_id', mockId);
-        try{ saveRequestHistory(data, mockId); }catch(e){/*ignore*/}
+        try{ saveRequestHistory(payload, mockId); }catch(e){/*ignore*/}
         // also store a mock result to be returned by GET for local testing
         const mockResult = {
           status: 'done',
