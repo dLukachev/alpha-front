@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Revenue Prototype — Главная</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a href="index.html" class="logo"><img src="assets/logo.png" alt="Alfa Bank" class="brand-logo"></a>
+  </header>
+  <main class="centered">
+    <h1 class="brand">Альфа — Прототип скоринга</h1>
+
+    <p class="lead">Форма для ввода данных клиента. После отправки фронт делает POST `/finance` и переходит к странице результатов.</p>
+
+    <div class="card form-card">
+      <h2>Данные клиента</h2>
+      <form id="client-form">
+        <div class="row">
+          <input name="last_name" placeholder="Фамилия" required />
+          <input name="first_name" placeholder="Имя" required />
+          <input name="middle_name" placeholder="Отчество" />
+        </div>
+
+        <div class="row">
+          <label class="small">Возраст
+            <input name="age" type="number" min="18" max="100" value="35" required />
+          </label>
+          <label class="small">Ежемесячный доход (₽)
+            <input name="income" type="number" min="0" step="1000" value="80000" required />
+          </label>
+        </div>
+
+        <div class="row">
+          <label>Есть ли дети
+            <select name="has_children"><option value="no">Нет</option><option value="yes">Да</option></select>
+          </label>
+          <label>Семейный статус
+            <select name="marital_status"><option>Не указано</option><option>Холост/Не замужем</option><option>Женат/Замужем</option></select>
+          </label>
+        </div>
+
+        <div class="row">
+          <label>Кредитная история
+            <select name="credit_history"><option value="good">Хорошая</option><option value="average">Средняя</option><option value="bad">Плохая</option></select>
+          </label>
+          <label>Сумма запрашиваемого кредита (₽)
+            <input name="request_amount" type="number" min="0" step="1000" value="500000" />
+          </label>
+        </div>
+
+        <div class="row">
+          <label>Стаж (лет)
+            <input name="employment_years" type="number" min="0" max="60" value="5" />
+          </label>
+          <label>Наличие текущих кредитов
+            <select name="existing_loans"><option value="no">Нет</option><option value="yes">Да</option></select>
+          </label>
+        </div>
+
+        <div class="controls-row">
+          <button class="btn" type="submit">Отправить</button>
+          <button class="btn ghost" type="button" id="fill-sample">Заполнить пример</button>
+        </div>
+      </form>
+      <p class="muted small">Данные отправляются на бекенд (POST /finance). В ответ ожидается `task_id`, по которому затем будут запрашиваться результаты (GET /task/{task_id}).</p>
+    </div>
+  </main>
+
+  <script>window.BACKEND_URL = 'http://localhost:8000';</script>
+  <script src="js/main.js"></script>
+</body>
+</html>
