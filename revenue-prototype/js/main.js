@@ -29,7 +29,6 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 (function(){
-  // small utility
   const $ = id => document.getElementById(id);
 
   // Backend base URL: leave empty string for same-origin, or override
