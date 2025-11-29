@@ -182,25 +182,7 @@ document.addEventListener('DOMContentLoaded', function () {
           // navigate to result page with id
           location.href = 'model.html?task_id=' + encodeURIComponent(taskId);
         }catch(err){
-        // fallback: simulate the server response (mock) and navigate with example id
-        console.warn('POST /finance failed, using mock response', err);
-        const mockId = 'd6c6402e-7423-46ed-ada0-44bb923613ee';
-        localStorage.setItem('last_task_id', mockId);
-        try{ saveRequestHistory(payload, mockId); }catch(e){/*ignore*/}
-        // also store a mock result to be returned by GET for local testing
-        const mockResult = {
-          status: 'done',
-          result: {
-            score: 0.73,
-            decision: 'approve',
-            probability_default: 0.15,
-            monthly_payment: 12500,
-            timeline: [0,1,2,3,4],
-            revenue_series: [100000,120000,140000,160000,180000]
-          }
-        };
-        localStorage.setItem('mock_result_' + mockId, JSON.stringify(mockResult));
-        location.href = 'model.html?task_id=' + encodeURIComponent(mockId);
+            alert('POST /finance failed');
       }
     });
   }
