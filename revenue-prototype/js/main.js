@@ -265,6 +265,49 @@ document.addEventListener('DOMContentLoaded', function () {
       tr.appendChild(keyTd); tr.appendChild(valTd);
       tbody.appendChild(tr);
     });
+    // render recommendations (use server-provided or generated mock)
+    try{ renderRecommendations(obj); }catch(e){ console.warn('renderRecommendations failed',e) }
+  }
+
+  function renderRecommendations(obj){
+    const container = document.getElementById('recommendations-content');
+    if(!container) return;
+    // allow server-provided recommendations array
+    let recs = obj && obj.recommendations;
+    if(!Array.isArray(recs)){
+      // build mock suggestions based on available fields
+      const decision = obj && (obj.decision || (obj.result && obj.result.decision));
+      const prob = obj && (obj.probability_default ?? (obj.result && obj.result.probability_default));
+      const monthly = obj && (obj.monthly_payment ?? (obj.result && obj.result.monthly_payment));
+      const requestAmt = obj && (obj.request_amount ?? (obj.result && obj.result.request_amount));
+      recs = [];
+      if(typeof requestAmt === 'number'){
+        if(requestAmt > 500000) recs.push('Большой кредит — рекомендуется снизить сумму запроса для уменьшения риска.');
+        else recs.push('Сумма запроса находится в приемлемом диапазоне.');
+      } else {
+        recs.push('Проверьте сумму запроса и кредитную историю клиента.');
+      }
+      if(typeof monthly === 'number') recs.push(`Примерный ежемесячный платёж — ${formatMoney(monthly)}; проверить платёжеспособность.`);
+      if(typeof prob === 'number'){
+        if(prob > 0.3) recs.push('Высокая вероятность дефолта — требуется дополнительная проверка документов.');
+        else recs.push('Низкая вероятность дефолта — можно рассмотреть выдачу при нормальной истории.');
+      }
+      if(decision === 'approve') recs.push('Решение модели: одобрено — подготовить документы для выдачи.');
+      else if(decision === 'decline') recs.push('Решение модели: отказ — подготовить уведомление клиенту и предложить альтернативы.');
+      // add some generic rules
+      recs.push('Максимальный рекомендуемый срок: 60 месяцев.');
+      recs.push('Проверять: паспорта, источники дохода и кредитную историю.');
+    }
+    // render as a list
+    container.innerHTML = '';
+    const ul = document.createElement('ul');
+    ul.style.margin = 0; ul.style.paddingLeft = '18px';
+    recs.forEach(r=>{
+      const li = document.createElement('li'); li.textContent = r; li.style.marginBottom = '6px';
+      ul.appendChild(li);
+    });
+    container.classList.remove('muted');
+    container.appendChild(ul);
   }
 
   // wire up polling on model page if task_id present

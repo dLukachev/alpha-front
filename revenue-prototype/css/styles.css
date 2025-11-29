@@ -77,6 +77,10 @@ canvas{width:100%;height:300px;border-radius:8px;background:linear-gradient(180d
   .container{grid-template-columns:1fr;}
   canvas{height:220px}
 }
+/* Recommendations block */
+.recommendations h3{margin:0 0 28px 0;font-size:16px}
+.recommendations ul{padding-left:18px;margin:8px 0}
+.recommendations li{margin-bottom:6px;color:var(--muted)}
 /* subtle appear animation */
 .card, .controls, .output{transform:translateY(6px);opacity:0;animation:fadeIn .36s ease forwards}
 .card{animation-delay:0.05s}
