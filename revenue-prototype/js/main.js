@@ -323,6 +323,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const id = getQueryParam('task_id') || localStorage.getItem('last_task_id');
     if(!id) return alert('task_id не указан');
     if(pollToken) clearTimeout(pollToken);
+    // Показать анимацию загрузки для рекомендаций
+    const recommendationsContent = document.getElementById('recommendations-content');
+    if(recommendationsContent) {
+      recommendationsContent.classList.add('muted', 'small');
+      recommendationsContent.textContent = 'Загрузка рекомендаций...';
+    }
     pollTask(id).catch(()=>{});
   });
 
