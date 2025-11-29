@@ -329,7 +329,8 @@ document.addEventListener('DOMContentLoaded', function () {
   cancelBtn && cancelBtn.addEventListener('click', ()=>{
     if(pollToken) clearTimeout(pollToken);
     spinner && (spinner.style.display = 'none');
-    statusBox && (statusBox.innerHTML += '<div class="muted small">Опрос отменён.</div>');
+    // navigate back to main page
+    window.location.href = 'index.html';
   });
 
   // re-render chart on resize
