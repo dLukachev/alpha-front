@@ -257,6 +257,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if(!tbody) return;
     tbody.innerHTML = '';
     Object.entries(obj).forEach(([k,v])=>{
+      // skip recommendations key
+      if(k === 'recommendations') return;
       // if array of numbers we show chart
       if(Array.isArray(v) && v.length>0 && v.every(x=>typeof x==='number')){
         // render chart using this array
