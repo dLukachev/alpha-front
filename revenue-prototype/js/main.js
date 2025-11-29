@@ -35,6 +35,8 @@ document.addEventListener('DOMContentLoaded', function () {
       if (!resp.ok) throw new Error('Ошибка отправки данных');
       const result = await resp.json();
       if (result.task_id) {
+        // save to history for quick access later
+        try{ saveRequestHistory(payload, result.task_id); }catch(e){/*ignore*/}
         window.location.href = 'model.html?task_id=' + encodeURIComponent(result.task_id);
       } else {
         alert('Ошибка: task_id не получен');
@@ -53,6 +55,27 @@ document.addEventListener('DOMContentLoaded', function () {
   //   - in browser console: window.BACKEND_URL = 'http://localhost:8000'
   //   - before loading this script add: <script>window.BACKEND_URL='http://localhost:8000'</script>
   const BACKEND_URL = (typeof window !== 'undefined' && window.BACKEND_URL) ? window.BACKEND_URL : '';
+
+  // ---------- Request history helpers ----------
+  function saveRequestHistory(payload, taskId){
+    try{
+      const key = 'request_history';
+      const stored = localStorage.getItem(key);
+      const arr = stored ? JSON.parse(stored) : [];
+      const entry = {
+        id: taskId,
+        timestamp: (new Date()).toISOString(),
+        payload: payload
+      };
+      // add newest to front
+      arr.unshift(entry);
+      // keep a reasonable limit
+      if(arr.length > 50) arr.length = 50;
+      localStorage.setItem(key, JSON.stringify(arr));
+      // also keep last_task_id for backwards compatibility
+      if(taskId) localStorage.setItem('last_task_id', taskId);
+    }catch(e){ console.warn('saveRequestHistory failed', e); }
+  }
 
   function formatMoney(x){
     if (typeof x !== 'number') return String(x);
@@ -153,7 +176,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const json = await res.json();
         const taskId = json.task_id || json.taskId || json.id;
         if(!taskId) throw new Error('no-task-id');
-        // store for later retrieval
+        // store for later retrieval and history
+        try{ saveRequestHistory(data, taskId); }catch(e){/*ignore*/}
         localStorage.setItem('last_task_id', taskId);
         // navigate to result page with id
         location.href = 'model.html?task_id=' + encodeURIComponent(taskId);
@@ -162,6 +186,7 @@ document.addEventListener('DOMContentLoaded', function () {
         console.warn('POST /finance failed, using mock response', err);
         const mockId = 'd6c6402e-7423-46ed-ada0-44bb923613ee';
         localStorage.setItem('last_task_id', mockId);
+        try{ saveRequestHistory(data, mockId); }catch(e){/*ignore*/}
         // also store a mock result to be returned by GET for local testing
         const mockResult = {
           status: 'done',

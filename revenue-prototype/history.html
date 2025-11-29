@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Revenue Prototype — История запросов</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a href="index.html" class="logo"><img src="assets/logo.png" alt="Alfa Bank" class="brand-logo"></a>
+    <nav class="topnav"><a href="index.html" class="nav-link">Главная</a></nav>
+  </header>
+
+  <main class="centered">
+    <h1>История запросов</h1>
+    <p class="lead">Здесь отображается локальная история отправленных запросов. Нажмите «Открыть», чтобы перейти к результатам задания.</p>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <strong>Запросы</strong>
+        <div>
+          <button id="clear-history" class="btn ghost">Очистить историю</button>
+        </div>
+      </div>
+
+      <div id="history-list" class="muted small">Загрузка...</div>
+    </div>
+  </main>
+
+  <script src="js/history.js"></script>
+</body>
+</html>
